@@ -1,0 +1,5 @@
+int32 goal_num
+---
+bool succeeded
+---
+int32 current_num

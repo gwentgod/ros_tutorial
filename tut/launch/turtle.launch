@@ -1,0 +1,10 @@
+<launch>
+
+    <!-- <rosparam file="$(find tut)/config/background.yaml" command="load"/> -->
+    <!-- <param name="turtle1/background_r" value="225"/> -->
+
+    <node pkg="turtlesim" type="turtlesim_node" name="turtle1"/>
+    <node pkg="tut" type="commander.py" name="commander"/>
+    <node pkg="tut" type="observer.py" name="observer" output="screen"/>
+  
+</launch>
