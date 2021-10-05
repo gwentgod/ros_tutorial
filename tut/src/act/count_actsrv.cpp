@@ -2,65 +2,60 @@
 #include <actionlib/server/simple_action_server.h>
 #include <tut/CountAction.h>
 
+
 class countActionServer
 {
 private:
-    // Init
     ros::NodeHandle nh;
     ros::Rate rate;
     actionlib::SimpleActionServer<tut::CountAction> actServer;
 
-    // Init messages
     tut::CountFeedback feedback_msg;
     tut::CountResult result_msg;
-    int goal;
 
-    // Execution
+    // execute counting
     void executeCallback(const tut::CountGoalConstPtr& goal_msg)
     {
-        goal = goal_msg->goal_num;
+        int goal = goal_msg->goal_num;
         ROS_INFO("Received goal %d", goal);
-        
-        for (int progress = 0; progress <= goal; ++progress) {
-            rate.sleep();
 
-            // Action died or preempted
-            if (!actServer.isActive() || actServer.isPreemptRequested()) {return;}
-            
-            // Action succeeded
+        int progress = 0;
+        while (ros::ok()) {
+            // preempted
+            if (actServer.isPreemptRequested()) {
+                ROS_WARN("I got preempt!");
+                result_msg.succeeded = 0;
+                actServer.setPreempted(result_msg);
+                return;
+            }
+
+            // succeeded
             if (progress == goal) {
                 result_msg.succeeded = 1;
                 actServer.setSucceeded(result_msg);
-                ROS_INFO("Reached goal %d", goal);
+                ROS_INFO("Successfully reached goal %d", goal);
+                return;
             }
 
-            // Executing
+            // executing
             else {
+                rate.sleep();
+                ++progress;
                 feedback_msg.current_num = progress;
                 actServer.publishFeedback(feedback_msg);
             }
         }
     }
 
-
-    void preemptCallback()
-    {
-        ROS_WARN("I got preempt");
-        result_msg.succeeded = 0;
-        actServer.setPreempted(result_msg);
-    }
-
-
 public:
     countActionServer()
     : rate(2),
     actServer(nh, "/count", boost::bind(&countActionServer::executeCallback, this, _1), false)
-      
     {
-        actServer.registerPreemptCallback(boost::bind(&countActionServer::preemptCallback, this));
         actServer.start();
     }
 };
+
 
 int main(int argc, char** argv)
 {
