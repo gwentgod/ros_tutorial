@@ -96,6 +96,8 @@ catkin_ws/
 
 
 
+
+
 ### Hello World!
 
 ```c++
@@ -129,6 +131,17 @@ ros.logerr("Error from ROS!")
 
 
 
+#### cmd
+
+```bash
+roscore
+rosrun pkg exec
+```
+
+
+
+
+
 ### Topic
 
 * A "chatroom" provided by ROS Master that other nodes can write to and read from is called a topic
@@ -138,14 +151,14 @@ ros.logerr("Error from ROS!")
 * The structure of the message is `.msg`, and should be stored in `pkg/msg`
 
   ```
-  /* eg. geometry_msgs/Vector3 */
+  ## eg. geometry_msgs/Vector3
   
   float64 x
   float64 y
   float64 z
   
   
-  /* eg. geometry_msgs/Twist */
+  ## eg. geometry_msgs/Twist
   
   geometry_msgs/Vector3 linear
   geometry_msgs/Vector3 angular
@@ -156,6 +169,8 @@ ros.logerr("Error from ROS!")
 * The same node can be the publisher of multiple topics and the subscriber of multiple topics simultaneously
 
 * It is possible for the message to be empty
+
+
 
 #### cmd
 
@@ -173,7 +188,7 @@ rostopic
 ros::Publisher publisher = nh.advertise<pkg::Msg>("/topic", /*queue size=*/100);
 pkg::Msg msg;
 // edit msg
-pub.publish(msg);
+publisher.publish(msg);
 ```
 
 ```c++
@@ -206,6 +221,29 @@ ros.spin()
 
 
 
+
+
+### Define messages
+
+* Dependence: `message_generation`, `message_runtime`
+
+  ```cmake
+  # CMakeLists.txt
+  find_package(catkin REQUIRED ... message_generation)
+  add_action_files(FILES ... *.action)
+  generate_messages(DEPENDENCIES ... message_runtime)
+  ```
+
+  ```xml
+  <!-- package.xml -->
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+  ```
+
+
+
+
+
 ### rosbag
 
 #### cmd
@@ -220,7 +258,7 @@ rosbag
 
 * rosparam allows you to store and manipulate data on the ROS Parameter Server 
 * The Parameter Server can store integers, floats, boolean, dictionaries, and lists
-* If necessery, uses the `.yaml` file for save / load params
+* If necessary, uses the `.yaml` file to save / load params
 
 
 
@@ -255,7 +293,9 @@ rospy.delete_param("/param")
 
 
 
-### launch
+
+
+### Launch
 
 * Start multiple nodes at once
 * Check if a `roscore` is running. If not, start a `roscore`
@@ -281,6 +321,8 @@ roslaunch [pkg] [*.launch]
 	  <node pkg="package name" type="exec name" name="node name" args="-ab cd" output="screen"/>    
 </launch>
 ```
+
+
 
 
 
@@ -329,19 +371,19 @@ rosservice
 
 ```c++
 /* client */
-ros::service::waitForService("/service");
 ros::ServiceClient client = nh.serviceClient<pkg::Srv>("/service");
+client.waitForExistence();
 
 pkg::Srv srv;
-// edit srv.request
-ros::service::waitForService("/service");
+// send request
+// blocks until the servics finish, modifies srv.response as service response
 client.call(srv);
-// srv.response received
 ```
 
 ```c++
 /* server */
 bool Callback(pkg::srv::Request  &req, pkg::srv::Response &res);
+	// return true after action succeed
 
 ros::ServiceServer service = nh.advertiseService("/service", Callback);
 ros::spin();
@@ -354,18 +396,21 @@ ros::spin();
 client = ros.ServiceProxy('/srv', pkg.Srv)
 ros.wait_for_service('/srv')
 request = pkg.SrvRequest()
-# edit request
+# send request
+# blocks until the servics finish, returns response
 response = client(request)
 ```
 
 ```python
 ## server
 def srvCallback(request):
-  pass
+  return response
 
 ros.Service("/srv", pkg.Srv, srvCallback)
 ros.spin()
 ```
+
+
 
 
 
@@ -382,15 +427,15 @@ ros.spin()
 * The structure of the goal, result and feedback is `.action`
 
   ```
-  /* eg. CustomAction.action */
+  ## eg. CustomAction.action
   
-  // goal definition
+  # goal definition
   int32 target
   ---
-  // result definition
+  # result definition
   bool succeeded
   ---
-  // feedback
+  # feedback
   int32 progress
   ```
 
@@ -416,19 +461,49 @@ ros.spin()
 * Dependence: `actionlib`, `actionlib_msgs`
 
   ```cmake
-  CMakeLists.txt
+  ## CMakeLists.txt
   find_package(catkin REQUIRED ... message_generation actionlib actionlib_msgs)
   add_action_files(FILES ... *.action)
   generate_messages(DEPENDENCIES ... actionlib_msgs)
   ```
 
   ```xml
-  package.xml
+  <!-- package.xml -->
   <build_depend>actionlib</build_depend>
   <build_depend>actionlib_msgs</build_depend>
   <exec_depend>actionlib</exec_depend>
   <exec_depend>actionlib_msgs</exec_depend>
   ```
+
+
+
+#### cmd
+
+Actionlib does not provide command line tools. To send a goal to action server without action client, you can
+
+* Use the rostopic pub direct in a terminal
+
+  Action server will provide the following topics:
+
+  ```
+  /actServer/cancel
+  /actServer/feedback
+  /actServer/goal
+  /actServer/result
+  /actServer/status
+  ```
+
+  These are all normal topics and can be published / subscribed normally
+
+* Use axclient from actionlib
+
+  The actionlib offers a graphical way to send goal to action server. To use this interface, run in a terminal
+
+  ```bash
+  rosrun actionlib axclient.py /action_name
+  ```
+
+
 
 
 
@@ -439,14 +514,16 @@ ros.spin()
 #include <actionlib/server/simple_action_server.h>
 
 // actin file name: Act.action
-
-tut::ActFeedback feedback_msg;
-tut::ActResult result_msg;
+pkg::ActFeedback feedback_msg;
+pkg::ActResult result_msg;
 
 void executeCallback(const pkg::ActGoalConstPtr& goal_msg)
 {
 	// check if action is died or preempted
-	if (!actServer.isActive() || actServer.isPreemptRequested()){}
+	if (!actServer.isActive() || actServer.isPreemptRequested()) {
+    // send result when preempted
+    actServer.setPreempted(result_msg);
+  }
 	// send result when succeeded
   actServer.setSucceeded(result_msg);
 	// send feedback
@@ -461,13 +538,20 @@ actServer.start();
 ```
 
 ``` c++
+/* action client */
+#include <actionlib/server/simple_action_client.h>
+
 void startCallback();
 void feedbackCallback(const pkg::ActFeedbackConstPtr& feedback);
 void finishCallback(const actionlib::SimpleClientGoalState& state, 
                     const pkg::ActResultConstPtr& result);
+
 // set the 2nd param true causes the client to spin its own thread
-actionlib::SimpleActionClient<tut::CountAction> actClient("/act_name", true);
+actionlib::SimpleActionClient<pkg::ActAction> actClient("/act_name", true);
+pkg::ActGoal goal_msg;
 actClient.sendGoal(goal_msg, &finishCallback, &startCallback, &feedbackCallback);
+// blocks until this goal finishes or timeout. Returs finished ? true : false
+actClient.waitForResult(ros::Duration(waiting_time));
 // cancle the goal
 actClient.cancelGoal();
 
@@ -476,10 +560,42 @@ actClient.cancelGoal();
 
 
 ```python
-TODO
+## action client
+import actionlib
+
+def feedbackCallback(feedback):
+	pass
+def activeCallback():
+	pass
+def doneCallback(status, result):
+	pass
+
+actClient = actionlib.SimpleActionClient('/act_name', ActAction)
+actClient.wait_for_server()
+goal = ActGoal()
+actClient.send_goal(goal, feedback_cb=feedbackCallback,
+                    active_cb=activeCallback, done_cb=doneCallback)
+# blocks until this goal finishes or timeout. Returs finished ? true : false
+actClient.wait_for_result(ros.Duration(wait_time))
+actClient.cancel_goal()
 ```
 
+```python
+## action server
+feedback = ActFeedback()
+result = ActResult()
 
+def executeCallback(goal):
+  # check preemption
+  if (actSrv.is_preempt_requested()):
+		# send result when preempted
+    actSrv.set_preempted(result)
+  # send feedback
+  actSrv.publish_feedback(feedback)
+  # send result when succeeded
+  actSrv.set_succeeded(result)
+
+```
 
 
 
