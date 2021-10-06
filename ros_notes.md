@@ -12,9 +12,8 @@
   * info, warn, error
   * catkin_make
 * Topic
-* Define messages
   * cmakelist.txt & packages.xml
-* rosbag
+* Define messages
 * parameter
 * launch
 * Server
@@ -187,17 +186,16 @@ rostopic
 /* publisher */
 ros::Publisher publisher = nh.advertise<pkg::Msg>("/topic", /*queue size=*/100);
 pkg::Msg msg;
-// edit msg
 publisher.publish(msg);
 ```
 
 ```c++
 /* subscriber */
-void subCallback(const std_msgs::String::ConstPtr& msg);
+void subCallback(const pkg::Msg::ConstPtr& msg);
 
 ros::Subscriber subscriber = nh.subscribe("/topic", /*queue size=*/100, subCallback);
 
-ros::spin();
+ros::spin(); // ros::spinOnce();
 ```
 
 
@@ -215,7 +213,7 @@ publisher.publish(msg)
 def subCallback(msg):
   pass
 
-ros.Subscriber("/topic", pkg.Msg, subCallback)
+subscriber = ros.Subscriber("/topic", pkg.Msg, subCallback)
 ros.spin()
 ```
 
@@ -244,19 +242,9 @@ ros.spin()
 
 
 
-### rosbag
-
-#### cmd
-
-```
-rosbag
-```
-
-
-
 ### Parameter
 
-* rosparam allows you to store and manipulate data on the ROS Parameter Server 
+* Parameter allows you to store and manipulate data on the ROS Parameter Server 
 * The Parameter Server can store integers, floats, boolean, dictionaries, and lists
 * If necessary, uses the `.yaml` file to save / load params
 
@@ -338,7 +326,7 @@ roslaunch [pkg] [*.launch]
 * The structure of the request and response is `.srv`, and should be stored in `pkg/srv`
 
   ```
-  /* eg. turtlesim/Spawn */
+  ## eg. turtlesim/Spawn
   
   // Request
   float32 x
@@ -375,8 +363,8 @@ ros::ServiceClient client = nh.serviceClient<pkg::Srv>("/service");
 client.waitForExistence();
 
 pkg::Srv srv;
-// send request
-// blocks until the servics finish, modifies srv.response as service response
+// `call()` send request and wait for servic
+// If the service call succeeded, call() will return true and the value in srv.response will be valid.
 client.call(srv);
 ```
 
@@ -429,13 +417,13 @@ ros.spin()
   ```
   ## eg. CustomAction.action
   
-  # goal definition
+  # Goal
   int32 target
   ---
-  # result definition
+  # Result
   bool succeeded
   ---
-  # feedback
+  # Feedback
   int32 progress
   ```
 
@@ -495,6 +483,8 @@ Actionlib does not provide command line tools. To send a goal to action server w
 
   These are all normal topics and can be published / subscribed normally
 
+
+
 * Use axclient from actionlib
 
   The actionlib offers a graphical way to send goal to action server. To use this interface, run in a terminal
@@ -502,8 +492,6 @@ Actionlib does not provide command line tools. To send a goal to action server w
   ```bash
   rosrun actionlib axclient.py /action_name
   ```
-
-
 
 
 
@@ -594,8 +582,17 @@ def executeCallback(goal):
   actSrv.publish_feedback(feedback)
   # send result when succeeded
   actSrv.set_succeeded(result)
-
 ```
 
 
+
+
+
+### And More
+
+* [ROS Tutorials Home Page](http://wiki.ros.org/ROS/Tutorials)
+* [Navigating the ROS Filesystem](http://wiki.ros.org/ROS/Tutorials/NavigatingTheFilesystem) & [Using rosed to edit files in ROS](http://wiki.ros.org/ROS/Tutorials/UsingRosEd)
+* [Recording and playing back data](http://wiki.ros.org/ROS/Tutorials/Recording and playing back data) & [Reading messages from a bag file](http://wiki.ros.org/ROS/Tutorials/reading msgs from a bag file)
+* [TF](http://wiki.ros.org/tf/Tutorials)
+* [Where Next?](http://wiki.ros.org/ROS/Tutorials/WhereNext)
 
