@@ -12,7 +12,9 @@ def adderCallback(request):
 
 def main():
     ros.init_node("adder_srvpy")
-    ros.Service("/adder", Adder, adderCallback)
+    
+    server = ros.Service("/adder", Adder, adderCallback)
+    
     ros.loginfo("Adder ready!")
     ros.spin()
 

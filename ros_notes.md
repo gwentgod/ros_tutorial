@@ -394,7 +394,7 @@ response = client(request)
 def srvCallback(request):
   return response
 
-ros.Service("/srv", pkg.Srv, srvCallback)
+server = ros.Service("/srv", pkg.Srv, srvCallback)
 ros.spin()
 ```
 
@@ -590,9 +590,12 @@ def executeCallback(goal):
 
 ### And More
 
-* [ROS Tutorials Home Page](http://wiki.ros.org/ROS/Tutorials)
+* [ROS Wiki](http://wiki.ros.org)
 * [Navigating the ROS Filesystem](http://wiki.ros.org/ROS/Tutorials/NavigatingTheFilesystem) & [Using rosed to edit files in ROS](http://wiki.ros.org/ROS/Tutorials/UsingRosEd)
 * [Recording and playing back data](http://wiki.ros.org/ROS/Tutorials/Recording and playing back data) & [Reading messages from a bag file](http://wiki.ros.org/ROS/Tutorials/reading msgs from a bag file)
-* [TF](http://wiki.ros.org/tf/Tutorials)
-* [Where Next?](http://wiki.ros.org/ROS/Tutorials/WhereNext)
+* [Getting started with roswtf](http://wiki.ros.org/ROS/Tutorials/Getting started with roswtf) - ROS debug tool
+* [TF](http://wiki.ros.org/tf/Tutorials) - Tool for tracking coordinate frames
+* [RoboRTS Tutorial](https://robomaster.github.io/RoboRTS-Tutorial/#/README) - The package we are working on
+
+
 
