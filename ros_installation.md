@@ -81,11 +81,13 @@ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-
+There will be no output for the above two c
 
 #### 3.4 Testing
 
 Try `roscore` in the container
+
+You should see the following output:
 
 ```
 root@cac940d2ee67:/# roscore
@@ -113,6 +115,8 @@ Optional, ~~GUI is for losers.~~
 
 Sometimes GUI tools can be really helpful, but when you are directly operating robots, GUI is difficult to access.
 
+
+
 In Container:
 
 ```bash
@@ -124,7 +128,7 @@ On Host:
 
 ```zsh
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ～/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 brew install socat
 brew install xquartz
