@@ -67,7 +67,7 @@ In Terminal
   ```bash
   apt update
   apt upgrade
-  apt install oros-melodic-rqt ros-melodic-rqt-common-plugins ros-melodic-turtlesim
+  apt install ros-melodic-rqt ros-melodic-rqt-common-plugins ros-melodic-turtlesim
   ```
 
   
