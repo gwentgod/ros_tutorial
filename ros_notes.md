@@ -9,13 +9,12 @@
 * turtesim
 * catkin workspace
 * Hello world!
-  * info, warn, error
   * catkin_make
 * Topic
-  * cmakelist.txt & packages.xml
+  * CMakelist.txt & packages.xml
 * Define messages
-* parameter
-* launch
+* Parameter
+* Launch
 * Server
 * Action
 
@@ -508,7 +507,7 @@ pkg::ActResult result_msg;
 void executeCallback(const pkg::ActGoalConstPtr& goal_msg)
 {
 	// check if action is died or preempted
-	if (!actServer.isActive() || actServer.isPreemptRequested()) {
+	if (actServer.isPreemptRequested()) {
     // send result when preempted
     actServer.setPreempted(result_msg);
   }
