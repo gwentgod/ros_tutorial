@@ -3,44 +3,22 @@
 #include <iostream>
 
 
-class Client
-{
-private:
-    ros::NodeHandle nh;
-    ros::ServiceClient client;
-    tut::Adder adder_msg;
-
-public:
-    Client()
-    : client(nh.serviceClient<tut::Adder>("/adder"))
-    {
-        client.waitForExistence();
-    }
-
-    int callAdder(int a, int b)
-    {
-        adder_msg.request.a.num = a;
-        adder_msg.request.b.num = b;
-        client.call(adder_msg);
-        return adder_msg.response.sum.num;
-    }
-};
-
-
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "adder_client");
-    Client client;
-    ros::Duration(1).sleep();
+    ros::NodeHandle nh;
+    ros::ServiceClient client = nh.serviceClient<tut::Adder>("/adder");
+    tut::Adder adder_msg;
 
-    int a, b, sum;
     while (ros::ok())
     {
+        client.waitForExistence();
+        ros::Duration(1).sleep();
         ROS_INFO("Please input two numbers:");
-        std::cin >> a >> b;
-        sum = client.callAdder(a, b);
+        std::cin >> adder_msg.request.a.num >> adder_msg.request.b.num;
+        client.call(adder_msg);
         
-        ROS_INFO("Sum = %d\n", sum);
+        ROS_INFO("Sum = %d\n", adder_msg.response.sum.num);
     }
 
     return 0;

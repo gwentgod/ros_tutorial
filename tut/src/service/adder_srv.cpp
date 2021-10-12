@@ -2,31 +2,22 @@
 #include "tut/Adder.h"
 
 
-class Adder
+bool add(tut::AdderRequest &request, tut::AdderResponse &responce)
 {
-private:
-    ros::NodeHandle nh;
-    ros::ServiceServer server;
-
-    static bool add(tut::AdderRequest &request, tut::AdderResponse &responce)
-    {
-        responce.sum.num = request.a.num + request.b.num;
-        return true;
-    }
-
-public:
-    Adder()
-    : server(nh.advertiseService("/adder", add))
-    {
-        ROS_INFO("Adder server ready!");
-    }
-};
+    responce.sum.num = request.a.num + request.b.num;
+    return true;
+}
 
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "adder_srv");
-    Adder adder;
+    ros::NodeHandle nh;
+    ros::ServiceServer server = nh.advertiseService("/adder", add);
+    ros::Duration(1).sleep();
+
+    ROS_INFO("Adder server ready!");
+    
     ros::spin();
 
     return 0;

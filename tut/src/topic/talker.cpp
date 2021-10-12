@@ -2,36 +2,23 @@
 #include "tut/Number.h"
 
 
-class Talker
-{
-private:
-    ros::NodeHandle nh;
-    ros::Publisher publisher;
-    tut::Number msg;
-
-public:
-    Talker()
-    : publisher(nh.advertise<tut::Number>("/chat", 100)) {}
-
-    void talk(int number)
-    {
-        msg.num = number;
-        publisher.publish(msg);
-    }
-};
-
-
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "talker");
-    Talker talker;
+    ros::NodeHandle nh;
+
+    ros::Publisher publisher = nh.advertise<tut::Number>("/chat", 100);
+
     ros::Rate rate(2);
-    ros::Duration(1).sleep();
+
+    // ros::Duration(1).sleep();
 
     int count = 1;
+    tut::Number msg;
     while (ros::ok())
     {
-        talker.talk(count);
+        msg.num = count;
+        publisher.publish(msg);
         ++count;
 
         rate.sleep();

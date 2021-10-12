@@ -1,33 +1,22 @@
 #include <ros/ros.h>
 #include "tut/Number.h"
 
-class Listener
+
+void chatCallback(const tut::Number::ConstPtr& msg)
 {
-private:
-    ros::NodeHandle nh;
-    ros::Subscriber subscriber;
-
-    static void chatCallback(const tut::Number::ConstPtr& msg)
-    {
-        ROS_INFO("I heard %d", msg->num);
-    }
-
-public:
-    Listener()
-    //                        name, queue size, callback function
-    : subscriber(nh.subscribe("/chat", 100, chatCallback))
-    {
-        ROS_INFO("Listening Started.");
-    }
-};
-
+    ROS_INFO("I heard %d", msg->num);
+}
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "listener");
-    Listener listener;
+    ros::NodeHandle nh;
+
+    // parameters of nh.subscribe: topic name, queue size, callback function
+    ros::Subscriber subscriber = nh.subscribe("/chat", 100, chatCallback);
     ros::Duration(1).sleep();
 
+    ROS_INFO("Listening Started.");
     ros::spin();
 
     return 0;
