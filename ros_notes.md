@@ -2,49 +2,63 @@
 
 
 
-* Concepts
-  * node
-  * package
-* Docker
+* Node
+* Docker & SSH 
 * turtesim
 * catkin workspace
+  * package
 * Hello world!
   * catkin_make
 * Topic
   * CMakelist.txt & packages.xml
-* Define messages
+* \* Define messages
 * Parameter
-* Launch
-* Server
-* Action
+* \* Launch
+* Service
+* \* Action
 
 ---
 
 
 
-### Concepts
-
-#### node
+### Node
 
 * An executable file within a ROS package
-* A progress that carries out a specific task
+* A process that carries out a specific task
 * Nodes can be written in different languages, and run on different hosts distributedly
 * Nodes must have unique names. If two nodes with the samename are launched, the previous one is kicked off.
 
-#### package
-
-* Basic unit in ROS projects
-* Including source code, configuration, dependencies, message definitions
 
 
 
-### Run ROS with Docker
 
-**Start Docker Engine and the container, then** enter the ros container with
+### Run ROS 
 
-```zsh
-docker exec -it ros bash
-```
+* With Docker
+
+  1. Start Docker Engine
+
+  2. Start the container
+
+     ```bash
+     docker start ros
+     ```
+
+  3. Enter the ros container with
+
+     ```bash
+     docker exec -it ros bash
+     ```
+
+* SSH
+
+  1. Connect to Wi-Fi: Xiaomi_CF12
+
+  2. ```bash
+     ssh icra@192.168.31.213
+     ```
+
+
 
 
 
@@ -63,6 +77,8 @@ source ~/.bashrc
 ```bash
 catkin_create_pkg <name> [dependency0] [dependency1] ...
 ```
+
+
 
 #### Tree
 
@@ -94,6 +110,15 @@ catkin_ws/
 
 
 
+#### package
+
+* Basic unit in ROS projects
+  * All source code must be placed in package
+* Packages must have unique names
+* Including source code, configuration, dependencies, message definitions
+
+
+
 
 
 ### Hello World!
@@ -108,8 +133,6 @@ int main(int argc, char** argv)
 	  ros::Duration(1).sleep();
 
     ROS_INFO("Hello form ROS!");
-    ROS_WARN("Warning from ROS!");
-    ROS_ERROR("Error from ROS!");
 
     return 0;
 }
@@ -117,14 +140,13 @@ int main(int argc, char** argv)
 
 ```python
 #!/usr/bin/env python3
+
 import rospy as ros
 
 ros.init_node('hello_py')
 ros.sleep(1)
 
 ros.loginfo("Hello from ROS!")
-ros.logwarn("Warning from ROS!")
-ros.logerr("Error from ROS!")
 ```
 
 
@@ -146,10 +168,10 @@ rosrun pkg exec
   * The node writing to the topic is called _Publisher_
   * The node reading from the topic is called _Subscriber_
   
-* The structure of the message is `.msg`, and should be stored in `pkg/msg`
+* The structure of a message is `.msg`, and should be stored in `pkg/msg`
 
   ```
-  ## eg. geometry_msgs/Vector3
+  ## e.g. geometry_msgs/Vector3
   
   float64 x
   float64 y
@@ -220,7 +242,7 @@ ros.spin()
 
 
 
-### Define messages
+### * Define messages
 
 * Dependence: `message_generation`, `message_runtime`
 
@@ -244,8 +266,21 @@ ros.spin()
 ### Parameter
 
 * Parameter allows you to store and manipulate data on the ROS Parameter Server 
+
 * The Parameter Server can store integers, floats, boolean, dictionaries, and lists
-* If necessary, uses the `.yaml` file to save / load params
+
+* You can save / load parameters to / from file. The file secture is `.yaml`
+
+  ```
+  ## e.g. icra2018.yaml
+  
+  image: icra2019.pgm
+  resolution: 0.05
+  origin: [0, 0, 0.000000]
+  negate: 0
+  occupied_thresh: 0.65
+  free_thresh: 0.196
+  ```
 
 
 
@@ -282,7 +317,7 @@ rospy.delete_param("/param")
 
 
 
-### Launch
+### * Launch
 
 * Start multiple nodes at once
 * Check if a `roscore` is running. If not, start a `roscore`
@@ -322,10 +357,10 @@ roslaunch [pkg] [*.launch]
   * The input of a service (function parameters) is called _request_
   * The output of a service (return values) is called _response_
 
-* The structure of the request and response is `.srv`, and should be stored in `pkg/srv`
+* The structure of a request and response is `.srv`, and should be stored in `pkg/srv`
 
   ```
-  ## eg. turtlesim/Spawn
+  ## e.g. turtlesim/Spawn
   
   // Request
   float32 x
@@ -401,7 +436,7 @@ ros.spin()
 
 
 
-### Action
+### * Action
 
 * Action is similar to Servics, but with extra ability to **cancel the request during execution** or **get periodic feedback** about how the request is progressing
 

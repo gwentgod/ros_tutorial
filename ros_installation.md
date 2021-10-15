@@ -50,13 +50,9 @@ In Terminal
 * Windows
 
   ```powershell
-  docker run -it --privileged \
-  --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v ~/ros_shared:/root/shared \
-  --name ros osrf/ros:melodic-desktop-full
+  docker run -it --privileged --name ros osrf/ros:melodic-desktop-full
   ```
-
+  
 * Mac - Intel chip
 
   ```zsh
@@ -81,6 +77,8 @@ In Terminal
   ```bash
   apt update
   apt upgrade
+  apt install python3-pip
+  pip3 install pyyaml rospkg
   ```
   
 * Apple Chip
@@ -88,9 +86,9 @@ In Terminal
   ```bash
   apt update
   apt upgrade
-  apt install ros-melodic-rqt ros-melodic-rqt-common-plugins ros-melodic-turtlesim
+  apt install ros-melodic-rqt ros-melodic-rqt-common-plugins ros-melodic-turtlesim python3-pip
+  pip3 install pyyaml rospkg
   ```
-
   
 
 
@@ -138,66 +136,40 @@ Optional, ~~GUI is for losers.~~
 
 Sometimes GUI tools can be really helpful, but when you are directly operating robots, GUI is difficult to access.
 
-
-
 * macOS
 
-In Container:
+  In Container:
 
-```bash
-echo "export DISPLAY=host.docker.internal:0" >> ~/.bashrc
-source ~/.bashrc
-```
+  ```bash
+  echo "export DISPLAY=host.docker.internal:0" >> ~/.bashrc
+  source ~/.bashrc
+  ```
 
-There will be no output for the above two lines
+  There will be no output for the above two lines
 
+  
 
+  On Host:
 
-On Host:
+  ```zsh
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+  brew install socat
+  brew install xquartz
+  ```
 
-```zsh
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
-brew install socat
-brew install xquartz
-```
+  
 
-**Restart your computer** after installations are complted.
+  **Restart your computer** after installations are complted.
 
+  On Host, **EVERY TIME** before starting GUI in container:
 
+  ```zsh
+  socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"
+  ```
 
-On Host, **EVERY TIME** before starting GUI in container:
-
-```bash
-socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"
-```
-
-This will run in foreground, so leave running and open a second terminal window to continue.
-
-* Windows
-
-On Host:
-
-Install [X server for Windows](https://sourceforge.net/projects/vcxsrv/). 
-
-Install with default configs unless you know what you are doing.
-
-**Restart your computer** after the installation is complted.
-
-
-
-On Host:
-
-```powershell
-xhost +local:root
-wsl2
-export containerId=$(docker ps -l -q)
-```
-
-However, this compromises the access control to X server on your host. So with a little effort, someone could display something on your screen, capture user input, in addition to making it easier to exploit other vulnerabilities that might exist in X. If your computer contains sensitive or confidential files, please refer to other permission control methods provided on [this page](http://wiki.ros.org/docker/Tutorials/GUI).
-
-
+  This will run in foreground, so leave running and open a second terminal window to continue.
 
 In Container, try `rqt`
 
