@@ -4,17 +4,17 @@
 
 * Node
 * Docker & SSH 
-* turtesim
 * catkin workspace
   * package
 * Hello world!
   * catkin_make
+* turtesim
 * Topic
   * CMakelist.txt & packages.xml
-* \* Define messages
-* Parameter
-* \* Launch
 * Service
+* Parameter
+* \* Define messages
+* \* Launch
 * \* Action
 
 ---
@@ -74,10 +74,6 @@ echo "source /root/shared/catkin_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-```bash
-catkin_create_pkg <name> [dependency0] [dependency1] ...
-```
-
 
 
 #### Tree
@@ -110,12 +106,30 @@ catkin_ws/
 
 
 
-#### package
+#### Package
 
 * Basic unit in ROS projects
   * All source code must be placed in package
 * Packages must have unique names
 * Including source code, configuration, dependencies, message definitions
+
+
+
+#### Create package
+
+```bash
+catkin_create_pkg <name> [dependency0] [dependency1] ...
+```
+
+
+
+#### Build code
+
+```bash
+catkin_make
+```
+
+You should always call `catkin_make` in the root of your catkin workspace,
 
 
 
@@ -157,6 +171,26 @@ ros.loginfo("Hello from ROS!")
 roscore
 rosrun pkg exec
 ```
+
+
+
+
+
+### turtlesim
+
+turtlesim is a tool made for teaching ROS and ROS packages
+
+* Run turtlesim: 
+
+  ```bash
+  rosrun turtlesim turtlesim_node
+  ```
+
+* Run a node to control turtlesim with keyboard
+
+  ```bash
+  rosrun turtlesim turtle_teleop_key 
+  ```
 
 
 
@@ -236,112 +270,6 @@ def subCallback(msg):
 
 subscriber = ros.Subscriber("/topic", pkg.Msg, subCallback)
 ros.spin()
-```
-
-
-
-
-
-### * Define messages
-
-* Dependence: `message_generation`, `message_runtime`
-
-  ```cmake
-  # CMakeLists.txt
-  find_package(catkin REQUIRED ... message_generation)
-  add_action_files(FILES ... *.action)
-  generate_messages(DEPENDENCIES ... message_runtime)
-  ```
-
-  ```xml
-  <!-- package.xml -->
-  <build_depend>message_generation</build_depend>
-  <exec_depend>message_runtime</exec_depend>
-  ```
-
-
-
-
-
-### Parameter
-
-* Parameter allows you to store and manipulate data on the ROS Parameter Server 
-
-* The Parameter Server can store integers, floats, boolean, dictionaries, and lists
-
-* You can save / load parameters to / from file. The file secture is `.yaml`
-
-  ```
-  ## e.g. icra2018.yaml
-  
-  image: icra2019.pgm
-  resolution: 0.05
-  origin: [0, 0, 0.000000]
-  negate: 0
-  occupied_thresh: 0.65
-  free_thresh: 0.196
-  ```
-
-
-
-#### cmd
-
-```cmd
-rosparam
-```
-
-
-
-
-#### Coding
-
-```c++
-Type val;
-// getParam() returns a bool to check if retrieving the parameter succeeded
-nh.getParam("/param", val);
-nh.setParam("/param", val);
-nh.deleteParam("/param");
-```
-
-
-
-```python
-ros.set_param("/param", var)
-if (ros.has_param("/param"):
-	var = ros.get_param("/param")
-rospy.delete_param("/param")
-
-```
-
-
-
-
-
-### * Launch
-
-* Start multiple nodes at once
-* Check if a `roscore` is running. If not, start a `roscore`
-* Set parameters, including load parameters from files
-
-
-
-#### cmd
-
-```bash
-roslaunch [pkg] [*.launch]
-```
-
-
-
-#### Coding
-
-```xml
-<launch>
-    <param name="/param" value="value" type="int"/>
-    <rosparam command="load" file="param.yaml"/>
-
-	  <node pkg="package name" type="exec name" name="node name" args="-ab cd" output="screen"/>    
-</launch>
 ```
 
 
@@ -430,6 +358,112 @@ def srvCallback(request):
 
 server = ros.Service("/srv", pkg.Srv, srvCallback)
 ros.spin()
+```
+
+
+
+
+
+### Parameter
+
+* Parameter allows you to store and manipulate data on the ROS Parameter Server 
+
+* The Parameter Server can store integers, floats, boolean, dictionaries, and lists
+
+* You can save / load parameters to / from file. The file secture is `.yaml`
+
+  ```
+  ## e.g. icra2018.yaml
+  
+  image: icra2019.pgm
+  resolution: 0.05
+  origin: [0, 0, 0.000000]
+  negate: 0
+  occupied_thresh: 0.65
+  free_thresh: 0.196
+  ```
+
+
+
+#### cmd
+
+```cmd
+rosparam
+```
+
+
+
+
+#### Coding
+
+```c++
+Type val;
+// getParam() returns a bool to check if retrieving the parameter succeeded
+nh.getParam("/param", val);
+nh.setParam("/param", val);
+nh.deleteParam("/param");
+```
+
+
+
+```python
+ros.set_param("/param", var)
+if (ros.has_param("/param"):
+	var = ros.get_param("/param")
+rospy.delete_param("/param")
+
+```
+
+
+
+
+
+### * Define messages
+
+* Dependence: `message_generation`, `message_runtime`
+
+  ```cmake
+  # CMakeLists.txt
+  find_package(catkin REQUIRED ... message_generation)
+  add_action_files(FILES ... *.action)
+  generate_messages(DEPENDENCIES ... message_runtime)
+  ```
+
+  ```xml
+  <!-- package.xml -->
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+  ```
+
+
+
+
+
+### * Launch
+
+* Start multiple nodes at once
+* Check if a `roscore` is running. If not, start a `roscore`
+* Set parameters, including load parameters from files
+
+
+
+#### cmd
+
+```bash
+roslaunch [pkg] [*.launch]
+```
+
+
+
+#### Coding
+
+```xml
+<launch>
+    <param name="/param" value="value" type="int"/>
+    <rosparam command="load" file="param.yaml"/>
+
+	  <node pkg="package name" type="exec name" name="node name" args="-ab cd" output="screen"/>    
+</launch>
 ```
 
 
