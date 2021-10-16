@@ -14,6 +14,7 @@ project(name)
 ```cmake
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   std_msgs
   # message_generation
   # actionlib_msgs
@@ -61,8 +62,6 @@ generate_messages(
 
 ```cmake
 catkin_package(
-	## For message generation
-	# CATKIN_DEPENDS roscpp std_msgs message_runtime 
 )
 ```
 
@@ -76,21 +75,23 @@ include_directories(
 )
 
 # Declare a C++ executable
-add_executable(node src/node.cpp)
+add_executable(<exec_name> <PATH_TO_SRC/src.cpp>)
 
 # Add cmake target dependencies of the executable
 # Necessery if there are custom messages
 # Change ${PROJECT_NAME} to other project names if the message arn't defined in the current pkg
-# add_dependencies(node ${PROJECT_NAME}_generate_messages_cpp)
+
 add_dependencies(
-${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+<exec_name> ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
 )
 
 # Specify libraries to link a library or executable target against
-target_link_libraries(node ${catkin_LIBRARIES})
+target_link_libraries(<exec_name> ${catkin_LIBRARIES})
 ```
 
 
+
+---
 
 
 

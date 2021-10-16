@@ -169,7 +169,7 @@ ros.loginfo("Hello from ROS!")
 
 ```bash
 roscore
-rosrun pkg exec
+rosrun <pkg> <exec>
 ```
 
 
